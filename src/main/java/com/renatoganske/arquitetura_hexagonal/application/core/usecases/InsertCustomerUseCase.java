@@ -4,6 +4,7 @@ import com.renatoganske.arquitetura_hexagonal.application.core.domain.Customer;
 import com.renatoganske.arquitetura_hexagonal.application.ports.in.InsertCustomerInputPort;
 import com.renatoganske.arquitetura_hexagonal.application.ports.out.FindAddressByZipCodeOutputPort;
 import com.renatoganske.arquitetura_hexagonal.application.ports.out.InsertCustomerOutputPort;
+import com.renatoganske.arquitetura_hexagonal.application.ports.out.SendCpfForValidationOutputPort;
 
 public class InsertCustomerUseCase implements InsertCustomerInputPort {
 
@@ -11,10 +12,13 @@ public class InsertCustomerUseCase implements InsertCustomerInputPort {
 
     private final InsertCustomerOutputPort insertCustomerOutputPort;
 
+    private final SendCpfForValidationOutputPort sendCpfForValidationOutputPort;
+
     public InsertCustomerUseCase(FindAddressByZipCodeOutputPort findAdressByZipCodeOutputPort,
-                                 InsertCustomerOutputPort insertCustomerOutputPort) {
+                                 InsertCustomerOutputPort insertCustomerOutputPort, SendCpfForValidationOutputPort sendCpfForValidationOutputPort) {
         this.findAdressByZipCodeOutputPort = findAdressByZipCodeOutputPort;
         this.insertCustomerOutputPort = insertCustomerOutputPort;
+        this.sendCpfForValidationOutputPort = sendCpfForValidationOutputPort;
     }
 
     @Override
@@ -22,6 +26,6 @@ public class InsertCustomerUseCase implements InsertCustomerInputPort {
         var address = findAdressByZipCodeOutputPort.find(zipCode);
         customer.setAddress(address);
         insertCustomerOutputPort.insert(customer);
-
+        sendCpfForValidationOutputPort.send(customer.getCpf());
     }
 }
